@@ -22,8 +22,16 @@ class SkillGraph:
         self._pre = prerequisites
 
     def order(self, skills: list[RequiredSkill]) -> list[RequiredSkill]:
-        """Топологическая сортировка. При равенстве — по id навыка, чтобы порядок был стабильным."""
+        """Топологическая сортировка. При равенстве — в порядке, который задал справочник.
+
+        Порядок всё равно стабильный: одинаковый вход даёт одинаковую карту (НФТ).
+        """
         by_id = {s.skill: s for s in skills}
+        position = {s.skill: i for i, s in enumerate(skills)}
+
+        def catalog_order(skill_id: SkillId) -> tuple[int, SkillId]:
+            return position.get(skill_id, len(skills)), skill_id
+
         result: list[RequiredSkill] = []
         visited: set[SkillId] = set()
         in_progress: set[SkillId] = set()
@@ -34,14 +42,14 @@ class SkillGraph:
             if skill_id in in_progress:
                 raise ValueError(f"В справочнике цикл в порядке изучения: {skill_id.value}")
             in_progress.add(skill_id)
-            for pre in sorted(self._pre.get(skill_id, set())):
+            for pre in sorted(self._pre.get(skill_id, set()), key=catalog_order):
                 visit(pre)
             in_progress.discard(skill_id)
             visited.add(skill_id)
             result.append(by_id[skill_id])
 
-        for skill_id in sorted(by_id):
-            visit(skill_id)
+        for s in skills:
+            visit(s.skill)
         return result
 
 
