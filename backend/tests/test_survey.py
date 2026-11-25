@@ -9,7 +9,7 @@ import pytest
 from app.modules.career_map.domain import SkillId
 from app.modules.catalog.repository import load_catalog
 from app.modules.survey.domain import Answer, SurveyError, evaluate
-from app.modules.survey.questions import QUESTIONS, Kind
+from app.modules.survey.questions import QUESTIONS, Kind, Option, Question
 
 
 def answers(**chosen: str | list[str]) -> list[Answer]:
@@ -145,3 +145,11 @@ def test_exclusive_options_only_in_multi_questions():
     for q in QUESTIONS:
         if any(o.exclusive for o in q.options):
             assert q.kind == Kind.MULTI, q.id
+
+
+def test_no_profession_in_answers_is_reported():
+    """Защита на будущее: если вопросы поменяют и профессия не выберется, ответим ошибкой, а не картой."""
+    one = (Question("q", "Вопрос", Kind.SINGLE, (Option("a", "Вариант", skills=("git",)),)),)
+
+    with pytest.raises(SurveyError, match="не получилось выбрать профессию"):
+        evaluate([Answer("q", ("a",))], one)
