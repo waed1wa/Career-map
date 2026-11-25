@@ -19,6 +19,18 @@ class Settings(BaseSettings):
     minio_secret_key: str = "kk-minio-secret"
     minio_bucket_resumes: str = "resumes"
 
+    # Ключи LLM — только в .env на стенде, в репозитории их нет. Пустой ключ — провайдер не подключён.
+    gigachat_api_key: str = ""  # «ключ авторизации» из личного кабинета Studio
+    gigachat_scope: str = "GIGACHAT_API_PERS"  # для физлица; для вуза может быть другой
+    gigachat_model: str = "GigaChat"
+    gigachat_base_url: str = "https://api.giga.chat/v1"
+    gigachat_oauth_url: str = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+    gigachat_ca_bundle: str = ""  # путь к сертификату НУЦ Минцифры; пусто — системные сертификаты
+    yandexgpt_api_key: str = ""
+    yandexgpt_folder_id: str = ""
+    yandexgpt_model: str = "yandexgpt-lite/latest"
+    yandexgpt_url: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
     # Какая LLM подключена: "fake" для разработки и тестов, "gigachat" или "yandexgpt" на стенде
     llm_provider: str = "fake"
     llm_timeout_seconds: float = 10.0

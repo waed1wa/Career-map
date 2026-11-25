@@ -45,29 +45,16 @@ class FakeLlmClient:
         return "Этот шаг нужен, чтобы закрыть требование из вакансий."
 
 
-class GigaChatClient:
-    """Заглушка. Подключение к API — спринт 3 (нужен ключ в .env)."""
-
-    name = "gigachat"
-
-    def complete(self, prompt: str) -> str:
-        raise LlmUnavailable("GigaChat ещё не подключён")
-
-
-class YandexGptClient:
-    """Запасной провайдер. Подключение — спринт 3."""
-
-    name = "yandexgpt"
-
-    def complete(self, prompt: str) -> str:
-        raise LlmUnavailable("YandexGPT ещё не подключён")
-
-
 class LlmGateway:
     """Перебирает провайдеров по очереди. Реализует порт Explainer."""
 
     def __init__(self, clients: list[LlmClient]):
         self._clients = clients
+
+    @property
+    def tokens_used(self) -> int:
+        """Сколько токенов потратили все провайдеры — для подсчёта расходов (риск Р-5)."""
+        return sum(getattr(c, "tokens_used", 0) for c in self._clients)
 
     def ask(self, prompt: str) -> str:
         safe_prompt = anonymize(prompt)
@@ -89,7 +76,19 @@ class LlmGateway:
 def build_gateway() -> LlmGateway:
     from app.core.config import get_settings  # импорт здесь, чтобы шлюз можно было тестировать без настроек
 
-    provider = get_settings().llm_provider
-    if provider == "fake":
+    settings = get_settings()
+    if settings.llm_provider == "fake":
         return LlmGateway([FakeLlmClient()])
-    return LlmGateway([GigaChatClient(), YandexGptClient()])
+
+    from app.integrations.llm.providers import GigaChatClient, YandexGptClient  # httpx нужен только здесь
+
+    clients: list[LlmClient] = []
+    if settings.gigachat_api_key:
+        clients.append(GigaChatClient.from_settings(settings))
+    if settings.yandexgpt_api_key and settings.yandexgpt_folder_id:
+        clients.append(YandexGptClient.from_settings(settings))
+    if settings.llm_provider == "yandexgpt":
+        clients.reverse()  # основной — тот, что указан в LLM_PROVIDER
+    if not clients:
+        log.warning("Ключей LLM нет: карта будет без пояснений, навыки — по словарю")
+    return LlmGateway(clients)
