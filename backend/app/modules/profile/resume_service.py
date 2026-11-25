@@ -7,7 +7,7 @@
 
 from uuid import uuid4
 
-from app.modules.profile.ports import ParseQueue, ResumeStorage
+from app.modules.profile.ports import JobStatus, ParseQueue, ResumeStorage
 from app.modules.profile.resume_file import ResumeFileError, check_resume_file, extract_text
 from app.modules.profile.skill_finder import FoundSkill, SkillFinder
 
@@ -30,6 +30,9 @@ class ResumeService:
         key = f"guest/{uuid4().hex}.{extension}"  # имя файла студента в ключ не попадает
         self._storage.put(key, data, CONTENT_TYPES[extension])
         return self._queue.submit(key, filename)
+
+    def status(self, job_id: str) -> JobStatus:
+        return self._queue.status(job_id)
 
 
 def parse_stored_resume(
