@@ -31,6 +31,7 @@ def ids(text: str) -> list[str]:
         ("Node.js, React.js", ["javascript", "react"]),
         ("HTML/CSS", ["html-css"]),
         ("Писал REST API на FastAPI", ["http-api", "web-framework"]),
+        ("Стажёр junior-python", ["python"]),
     ],
     ids=[
         "exact",
@@ -45,6 +46,7 @@ def ids(text: str) -> list[str]:
         "dot_inside_name",
         "slash_between_skills",
         "api_and_fastapi",
+        "after_hyphen",
     ],
 )
 def test_skills_are_found(text, expected):
