@@ -14,6 +14,12 @@ from app.integrations.llm.gateway import build_gateway
 from app.modules.career_map.builder import MapBuilder
 from app.modules.career_map.demo_catalog import DemoCatalog
 from app.modules.career_map.domain import SkillId
+from app.modules.catalog.repository import get_catalog
+from app.modules.profile.job_status import found_to_dict
+from app.modules.profile.minio_storage import MinioResumeStorage
+from app.modules.profile.resume_file import ResumeFileError
+from app.modules.profile.resume_service import parse_stored_resume
+from app.modules.profile.skill_finder import SkillFinder
 
 log = logging.getLogger(__name__)
 settings = get_settings()
@@ -34,6 +40,21 @@ def build_map(profession_id: str, skills: list[str]) -> dict[str, object]:
     builder = MapBuilder(DemoCatalog(), build_gateway())
     career_map = builder.build(profession_id, {SkillId(s) for s in skills})
     return {"profession_id": career_map.profession_id, "steps": [s.skill.value for s in career_map.steps]}
+
+
+@celery_app.task(name="app.worker.parse_resume")
+def parse_resume(key: str, filename: str) -> dict[str, object]:
+    """Разбор резюме по словарю (неделя 2). Файл удаляется из MinIO сразу после разбора.
+
+    Ошибку в файле (скан, повреждён) возвращаем как результат, а не как сбой задачи:
+    её текст нужно показать студенту.
+    """
+    storage = MinioResumeStorage.from_settings(settings)
+    try:
+        found = parse_stored_resume(storage, SkillFinder(get_catalog()), key, filename)
+    except ResumeFileError as error:
+        return {"error": str(error)}
+    return {"skills": [found_to_dict(f) for f in found]}
 
 
 @celery_app.task(name="app.worker.check_deadlines")
