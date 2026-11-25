@@ -52,6 +52,17 @@ def test_map_for_every_profession(profession_id):
     assert all(s.why for s in career_map.steps)
 
 
+@pytest.mark.parametrize("profession_id", PROFESSIONS)
+def test_beginner_map_follows_catalog_order(profession_id):
+    """Новичку показываем первые 8 навыков профессии ровно в том порядке, что в справочнике."""
+    catalog = load_catalog()
+    expected = catalog.profession(profession_id).skills[:MAX_STEPS]
+
+    career_map = MapBuilder(catalog).build(profession_id, set())
+
+    assert [s.skill.value for s in career_map.steps] == expected
+
+
 def test_why_can_differ_by_profession():
     catalog = load_catalog()
     backend = {s.skill.value: s.why for s in catalog.required_skills("backend-junior")}

@@ -63,6 +63,31 @@ def test_cycle_in_catalog_is_reported():
         graph.order(skills)
 
 
+def test_ties_follow_catalog_order():
+    """Навыки без зависимостей друг от друга идут в том порядке, в каком их поставил справочник.
+
+    Раньше при равенстве сортировали по алфавиту, и «docker» мог встать раньше «git».
+    """
+    skills = [
+        RequiredSkill(S("git"), "Git"),
+        RequiredSkill(S("docker"), "Docker"),
+        RequiredSkill(S("api"), "API"),
+    ]
+
+    ordered = SkillGraph({}).order(skills)
+
+    assert [s.skill.value for s in ordered] == ["git", "docker", "api"]
+
+
+def test_prerequisites_still_win_over_catalog_order():
+    """Порядок справочника — только подсказка: зависимость всё равно поднимает навык выше."""
+    skills = [RequiredSkill(S("react"), "React"), RequiredSkill(S("js"), "JavaScript")]
+
+    ordered = SkillGraph({S("react"): {S("js")}}).order(skills)
+
+    assert [s.skill.value for s in ordered] == ["js", "react"]
+
+
 def test_empty_skill_id_is_rejected():
     with pytest.raises(ValueError):
         SkillId("  ")
