@@ -88,6 +88,12 @@ class SkillReader:
         self._finder = finder
         self._llm = llm
 
+    def find(self, text: str) -> list[FoundSkill]:
+        """То же, что у SkillFinder, — чтобы фоновая задача не знала, какой способ работает."""
+        result = self.read(text)
+        log.info("Навыки из резюме: способ %s, найдено %d", result.method, len(result.skills))
+        return result.skills
+
     def read(self, text: str) -> ReadResult:
         by_dictionary = {f.skill.value: f for f in self._finder.find(text)}
         if self._llm is None:

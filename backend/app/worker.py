@@ -16,6 +16,7 @@ from app.modules.career_map.demo_catalog import DemoCatalog
 from app.modules.career_map.domain import SkillId
 from app.modules.catalog.repository import get_catalog
 from app.modules.profile.job_status import found_to_dict
+from app.modules.profile.llm_skills import SkillReader
 from app.modules.profile.minio_storage import MinioResumeStorage
 from app.modules.profile.resume_file import ResumeFileError
 from app.modules.profile.resume_service import parse_stored_resume
@@ -44,14 +45,18 @@ def build_map(profession_id: str, skills: list[str]) -> dict[str, object]:
 
 @celery_app.task(name="app.worker.parse_resume")
 def parse_resume(key: str, filename: str) -> dict[str, object]:
-    """Разбор резюме по словарю (неделя 2). Файл удаляется из MinIO сразу после разбора.
+    """Разбор резюме: LLM со сверкой по справочнику, а если LLM недоступна — словарь.
+
+    Файл удаляется из MinIO сразу после разбора.
 
     Ошибку в файле (скан, повреждён) возвращаем как результат, а не как сбой задачи:
     её текст нужно показать студенту.
     """
     storage = MinioResumeStorage.from_settings(settings)
     try:
-        found = parse_stored_resume(storage, SkillFinder(get_catalog()), key, filename)
+        catalog = get_catalog()
+        reader = SkillReader(catalog, SkillFinder(catalog), build_gateway())
+        found = parse_stored_resume(storage, reader, key, filename)
     except ResumeFileError as error:
         return {"error": str(error)}
     return {"skills": [found_to_dict(f) for f in found]}

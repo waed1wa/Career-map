@@ -24,7 +24,9 @@ def test_task_returns_skills_and_deletes_file(storage):
 
     result = worker.parse_resume("guest/a.pdf", "cv.pdf")
 
-    assert {"id": "sql", "title": "SQL и базы данных", "matched": "PostgreSQL"} in result["skills"]
+    # LLM в тестах поддельная (fake) и отвечает не списком — работает запасной путь по словарю
+    sql = {"id": "sql", "title": "SQL и базы данных", "matched": "PostgreSQL", "source": "dictionary"}
+    assert sql in result["skills"]
     assert storage.files == {}
 
 

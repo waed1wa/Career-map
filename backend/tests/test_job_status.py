@@ -20,6 +20,12 @@ def test_done_with_skills():
     assert [(s.skill.value, s.matched) for s in status.skills] == [("sql", "PostgreSQL")]
 
 
+def test_skill_found_by_llm_keeps_its_source():
+    result = {"skills": [{"id": "team-project", "title": "Проект", "matched": "", "source": "llm"}]}
+
+    assert status_from_celery("SUCCESS", result).skills[0].source == "llm"
+
+
 def test_done_without_skills_is_still_done():
     """Ничего не нашли — это не ошибка: студент отметит навыки сам."""
     status = status_from_celery("SUCCESS", {"skills": []})
