@@ -63,6 +63,13 @@ def test_beginner_map_follows_catalog_order(profession_id):
     assert [s.skill.value for s in career_map.steps] == expected
 
 
+def test_every_skill_except_resume_has_aliases():
+    """Без синонимов навык нельзя найти в резюме. «Резюме и отклики» в тексте резюме не ищем."""
+    without = {s.id for s in load_catalog().skills() if not s.aliases}
+
+    assert without == {"resume"}
+
+
 def test_why_can_differ_by_profession():
     catalog = load_catalog()
     backend = {s.skill.value: s.why for s in catalog.required_skills("backend-junior")}
@@ -126,6 +133,22 @@ BROKEN = {
     "bad_id": (
         lambda d: skill(d, "git").update(id="Git Hub"),
         "should match pattern",
+    ),
+    "same_alias_for_two_skills": (
+        lambda d: skill(d, "pandas")["aliases"].append("python"),
+        "Повторяется синоним: python",
+    ),
+    "alias_in_upper_case": (
+        lambda d: skill(d, "git")["aliases"].append("GitHub Actions"),
+        "пишем строчными",
+    ),
+    "alias_stem_too_short": (
+        lambda d: skill(d, "sql")["aliases"].append("бд*"),
+        "слишком короткая основа",
+    ),
+    "alias_with_bad_symbols": (
+        lambda d: skill(d, "sql")["aliases"].append("sql;drop"),
+        "недопустимые символы",
     ),
     "duplicate_skill_in_profession": (
         lambda d: d["professions"][1]["skills"].append("git"),
