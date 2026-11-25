@@ -48,8 +48,9 @@ def reader(answer: str | Exception | None) -> SkillReader:
         'Вот навыки: ["python", "sql"]. Удачи!',
         '```json\n["python", "sql"]\n```',
         '["Python", " sql "]',
+        '{"skills": ["python", "sql"]}',
     ],
-    ids=["clean_json", "json_in_text", "code_block", "case_and_spaces"],
+    ids=["clean_json", "json_in_text", "code_block", "case_and_spaces", "array_inside_object"],
 )
 def test_answers_that_we_understand(answer):
     assert parse_skill_ids(answer, KNOWN) == (["python", "sql"], [])
@@ -73,8 +74,8 @@ def test_duplicates_are_removed():
 
 @pytest.mark.parametrize(
     "answer",
-    ["Навыки: Python и SQL", '{"skills": ["python"]}', "[1, 2]", '["python"', ""],
-    ids=["no_json", "object_not_list", "not_strings", "broken_json", "empty"],
+    ["Навыки: Python и SQL", "[1, 2]", '["python"', ""],
+    ids=["no_json", "not_strings", "broken_json", "empty"],
 )
 def test_answers_we_reject(answer):
     with pytest.raises(LlmAnswerError):
