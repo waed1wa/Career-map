@@ -1,6 +1,10 @@
 """Фоновые задачи вызываются напрямую, без Redis: Celery выполняет задачу как обычную функцию."""
 
-from app.worker import build_map, check_deadlines
+import pytest
+
+pytest.importorskip("celery")
+
+from app.worker import build_map, check_deadlines  # noqa: E402
 
 
 def test_build_map_task_returns_steps():
