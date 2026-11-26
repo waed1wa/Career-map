@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": [
+    {"id": "git", "title": "Git и GitHub", "why": "Без него не возьмут в командный проект: весь код живёт в репозиториях", "prerequisites": []},
+    {"id": "linux", "title": "Командная строка Linux", "why": "Серверы почти всегда на Linux, а вакансии бэкенда просят работать в терминале", "prerequisites": []},
+    {"id": "python", "title": "Основы Python", "why": "Самый частый язык в вакансиях для джунов в бэкенде и анализе данных", "prerequisites": []},
+    {"id": "oop", "title": "ООП: классы и объекты", "why": "На нём построены все веб-фреймворки, и про него спрашивают на собеседованиях", "prerequisites": ["python"]},
+    {"id": "sql", "title": "SQL и базы данных", "why": "SQL встречается почти в каждой вакансии бэкенда и аналитика", "prerequisites": []},
+    {"id": "http-api", "title": "HTTP и REST API", "why": "Чтобы понимать, как клиент и сервер обмениваются данными", "prerequisites": []},
+    {"id": "web-framework", "title": "FastAPI или Django", "why": "Чтобы сделать своё первое API и показать его в резюме", "prerequisites": ["oop", "sql", "http-api"]},
+    {"id": "testing", "title": "Автотесты", "why": "Код с тестами берут в команду охотнее: его не страшно менять", "prerequisites": []},
+    {"id": "docker", "title": "Docker и запуск проекта", "why": "Чтобы проект запускался у всех одной командой и его можно было показать работающим", "prerequisites": ["linux", "web-framework"]},
+    {"id": "team-project", "title": "Первый проект в команде", "why": "Строка опыта в резюме: работодатели смотрят, умеешь ли ты работать с другими", "prerequisites": ["git"]},
+    {"id": "resume", "title": "Резюме и отклики", "why": "Собрать всё сделанное в резюме и подаваться на стажировки", "prerequisites": ["team-project"]},
+    {"id": "html-css", "title": "HTML и CSS", "why": "Основа любого интерфейса: без вёрстки не обходится ни одна вакансия фронтенда", "prerequisites": []},
+    {"id": "javascript", "title": "JavaScript", "why": "Язык, на котором работают все сайты в браузере", "prerequisites": ["html-css"]},
+    {"id": "figma", "title": "Работа с макетами в Figma", "why": "Фронтенд-разработчик собирает экраны по макетам дизайнера", "prerequisites": ["html-css"]},
+    {"id": "typescript", "title": "TypeScript", "why": "Большинство команд пишет фронтенд на TypeScript: типы ловят ошибки до запуска", "prerequisites": ["javascript"]},
+    {"id": "react", "title": "React", "why": "Самая частая библиотека в вакансиях фронтенда", "prerequisites": ["html-css", "javascript"]},
+    {"id": "excel", "title": "Excel и Google Таблицы", "why": "Первый инструмент аналитика: сводные таблицы и формулы нужны с первого дня", "prerequisites": []},
+    {"id": "statistics", "title": "Основы статистики", "why": "Чтобы отличать закономерность от случайности и не делать неверных выводов", "prerequisites": []},
+    {"id": "pandas", "title": "Pandas для анализа данных", "why": "Обрабатывать данные, которые не помещаются в Excel", "prerequisites": ["python"]},
+    {"id": "data-viz", "title": "Графики и дашборды", "why": "Результат анализа нужно показать так, чтобы его понял заказчик", "prerequisites": ["excel"]}
+  ],
+  "professions": [
+    {
+      "id": "backend-junior",
+      "title": "Junior Backend-разработчик",
+      "description": "Пишет серверную часть: API, базы данных, фоновые задачи",
+      "skills": ["git", "linux", "python", "oop", "sql", "http-api", "web-framework", "testing", "docker", "team-project", "resume"],
+      "why_overrides": {}
+    },
+    {
+      "id": "frontend-junior",
+      "title": "Junior Frontend-разработчик",
+      "description": "Делает интерфейс сайта или приложения, который видит пользователь",
+      "skills": ["git", "html-css", "javascript", "figma", "http-api", "typescript", "react", "testing", "team-project", "resume"],
+      "why_overrides": {
+        "http-api": "Чтобы интерфейс получал данные с сервера и отправлял их обратно"
+      }
+    },
+    {
+      "id": "data-analyst-junior",
+      "title": "Junior Аналитик данных",
+      "description": "Ищет в данных ответы на вопросы бизнеса и показывает их графиками",
+      "skills": ["excel", "sql", "statistics", "python", "pandas", "data-viz", "git", "team-project", "resume"],
+      "why_overrides": {
+        "python": "Чтобы автоматизировать обработку данных вместо ручной работы в таблицах",
+        "git": "Аналитики тоже хранят код и отчёты в репозиториях и работают в команде"
+      }
+    }
+  ]
+}
