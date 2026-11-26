@@ -48,7 +48,12 @@ def test_upload_then_status_with_skills(client, storage):
     assert response.status_code == 202
     status = client.get(f"/api/profile/resume/{response.json()['job_id']}").json()
     assert status["status"] == "done"
-    assert {"id": "sql", "title": "SQL и базы данных", "matched": "PostgreSQL"} in status["skills"]
+    assert {
+        "id": "sql",
+        "title": "SQL и базы данных",
+        "matched": "PostgreSQL",
+        "source": "dictionary",
+    } in status["skills"]
     assert storage.files == {}  # файл гостя не остался
 
 

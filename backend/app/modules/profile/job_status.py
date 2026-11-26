@@ -11,7 +11,7 @@ QUEUE_FAILED = "Не получилось разобрать резюме. По�
 
 
 def found_to_dict(found: FoundSkill) -> dict[str, str]:
-    return {"id": found.skill.value, "title": found.title, "matched": found.matched}
+    return {"id": found.skill.value, "title": found.title, "matched": found.matched, "source": found.source}
 
 
 def status_from_celery(state: str, result: object) -> JobStatus:
@@ -20,7 +20,12 @@ def status_from_celery(state: str, result: object) -> JobStatus:
         if "error" in result:
             return JobStatus(JobState.FAILED, error=str(result["error"]))
         skills = tuple(
-            FoundSkill(skill=SkillId(s["id"]), title=s["title"], matched=s["matched"])
+            FoundSkill(
+                skill=SkillId(s["id"]),
+                title=s["title"],
+                matched=s["matched"],
+                source=s.get("source", "dictionary"),
+            )
             for s in result.get("skills", [])
         )
         return JobStatus(JobState.DONE, skills=skills)

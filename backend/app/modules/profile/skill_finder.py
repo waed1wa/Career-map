@@ -24,6 +24,7 @@ class FoundSkill:
     skill: SkillId
     title: str
     matched: str  # как навык был написан в резюме — показываем студенту, чтобы он мог проверить
+    source: str = "dictionary"  # «dictionary» — назван прямо, «llm» — LLM поняла по смыслу
 
 
 def _alias_pattern(alias: str) -> str:

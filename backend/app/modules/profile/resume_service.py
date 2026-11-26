@@ -5,16 +5,23 @@
 (152-ФЗ, риск Р-8). Когда появится вход, навыки будем сохранять в профиль студента.
 """
 
+from typing import Protocol
 from uuid import uuid4
 
 from app.modules.profile.ports import JobStatus, ParseQueue, ResumeStorage
 from app.modules.profile.resume_file import ResumeFileError, check_resume_file, extract_text
-from app.modules.profile.skill_finder import FoundSkill, SkillFinder
+from app.modules.profile.skill_finder import FoundSkill
 
 CONTENT_TYPES = {
     "pdf": "application/pdf",
     "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
+
+
+class SkillSource(Protocol):
+    """Кто ищет навыки в тексте: словарь (SkillFinder) или LLM со словарём (SkillReader)."""
+
+    def find(self, text: str) -> list[FoundSkill]: ...
 
 
 class ResumeService:
@@ -36,7 +43,7 @@ class ResumeService:
 
 
 def parse_stored_resume(
-    storage: ResumeStorage, finder: SkillFinder, key: str, filename: str
+    storage: ResumeStorage, finder: SkillSource, key: str, filename: str
 ) -> list[FoundSkill]:
     """Это и делает фоновая задача. Файл удаляется в любом случае."""
     try:
