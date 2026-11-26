@@ -7,23 +7,14 @@
 """
 
 import logging
-import re
 from typing import Protocol
 
+from app.integrations.llm.anonymizer import anonymize
 from app.modules.career_map.domain import CareerMap, SkillId
 
 log = logging.getLogger(__name__)
 
-_EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
-_PHONE = re.compile(r"(?:\+7|8)[\s(-]*\d{3}[\s)-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}")
-_URL = re.compile(r"(?:https?://|www\.|t\.me/|vk\.com/)\S+", re.IGNORECASE)
-
-
-def anonymize(text: str) -> str:
-    """Убирает почту, телефоны и ссылки на профили до отправки в LLM (тест TC-04)."""
-    text = _EMAIL.sub("[почта]", text)
-    text = _URL.sub("[ссылка]", text)
-    return _PHONE.sub("[телефон]", text)
+__all__ = ["LlmGateway", "LlmUnavailable", "anonymize", "build_gateway"]
 
 
 class LlmClient(Protocol):
