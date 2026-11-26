@@ -37,4 +37,4 @@ def test_demo_map_endpoint():
 def test_not_ready_modules_answer_501():
     client = TestClient(create_app())
 
-    assert client.get("/api/auth/me").status_code == 501
+    assert client.get("/api/profile/me").status_code == 501

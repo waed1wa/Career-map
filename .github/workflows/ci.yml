@@ -22,7 +22,8 @@ jobs:
         run: ruff check . && ruff format --check .
       - name: Типы (mypy)
         run: mypy
-      - run: pytest -q
+      - name: Тесты и покрытие (pytest + pytest-cov, порог 70%)
+        run: pytest -q --cov=app --cov-report=term-missing
 
   frontend:
     runs-on: ubuntu-latest

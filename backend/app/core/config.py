@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     llm_provider: str = "fake"
     llm_timeout_seconds: float = 10.0
 
+    # Вход: ключ подписи токенов (в .env — свой, не короче 32 символов) и срок жизни токена
+    secret_key: str = "dev-only-secret-change-me-in-env-file"
+    token_ttl_minutes: int = 60 * 24
+
     # Правила по заявкам (инварианты из архитектуры)
     application_reminder_days: int = 5
     application_deadline_days: int = 7
